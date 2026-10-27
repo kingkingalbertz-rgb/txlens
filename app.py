@@ -1,4 +1,4 @@
-
+import re
 import streamlit as st
 
 APP_NAME = "TxLens"
@@ -17,12 +17,12 @@ tx_hash = st.text_input(
 
 if st.button("Analyze transaction"):
     tx_hash = tx_hash.strip()
+if not re.fullmatch(r"0x[0-9a-fA-F]{64}", tx_hash):
+    st.error("Invalid transaction hash format.")
+else:
+    st.success("Transaction hash format looks correct.")
+    st.code(tx_hash)
 
-    if len(tx_hash) != 66 or not tx_hash.startswith("0x"):
-        st.error("Invalid transaction hash format.")
-    else:
-        st.success("Transaction hash format looks correct.")
-        st.code(tx_hash)
 
 
 st.divider()
