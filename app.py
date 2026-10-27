@@ -1,4 +1,5 @@
 import re
+import requests
 import streamlit as st
 
 APP_NAME = "TxLens"
@@ -15,13 +16,54 @@ tx_hash = st.text_input(
     placeholder="Paste a transaction hash here...",
 )
 
+
 if st.button("Analyze transaction"):
     tx_hash = tx_hash.strip()
-if not re.fullmatch(r"0x[0-9a-fA-F]{64}", tx_hash):
-    st.error("Invalid transaction hash format.")
-else:
-    st.success("Transaction hash format looks correct.")
-    st.code(tx_hash)
+
+    if not re.fullmatch(r"0x[0-9a-fA-F]{64}", tx_hash):
+        st.error("Invalid transaction hash format.")
+
+    else:
+        api_key = st.secrets["ETHERSCAN_API_KEY"]
+
+        params = {
+            "chainid": "1",
+            "module": "proxy",
+            "action": "eth_getTransactionReceipt",
+            "txhash": tx_hash,
+            "apikey": api_key,
+        }
+
+        try:
+            response = requests.get(
+                "https://api.etherscan.io/v2/api",
+                params=params,
+                timeout=15,
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            receipt = data.get("result")
+
+            if not isinstance(receipt, dict):
+                st.error("Could not retrieve this transaction receipt.")
+                st.write(data)
+            else:
+                status = receipt.get("status")
+
+                if status == "0x1":
+                    st.success("Transaction succeeded.")
+                elif status == "0x0":
+                    st.error("Transaction reverted.")
+                else:
+                    st.warning("Transaction status is unavailable.")
+
+                st.write("Block number:", int(receipt["blockNumber"], 16))
+                st.write("Gas used:", int(receipt["gasUsed"], 16))
+
+        except requests.RequestException as error:
+            st.error(f"API request failed: {error}")
+
 
 
 
