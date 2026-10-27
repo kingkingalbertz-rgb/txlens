@@ -29,12 +29,5 @@ st.divider()
 
 st.info("Version 0.1 — Your transaction analysis tool is taking shape.")
 
-st.text_input(
-    "Ethereum transaction hash",
-    placeholder="Paste a transaction hash here...",
-)
-
-st.button("Analyze transaction")
-
 st.caption("Built with Python and Streamlit.")
 
