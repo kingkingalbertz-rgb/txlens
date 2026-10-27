@@ -137,4 +137,41 @@ st.divider()
 
 st.info("Version 0.1 — Your transaction analysis tool is taking shape.")
 
+st.subheader("Transaction Summary")
+
+if "status" in locals() and isinstance(receipt, dict):
+    if status == "0x1":
+        summary_status = "successfully"
+    elif status == "0x0":
+        summary_status = "failed"
+    else:
+        summary_status = "with an unknown execution status"
+
+    if isinstance(transaction, dict):
+        sender = transaction.get("from", "Unknown sender")
+        recipient = transaction.get("to") or "a newly created contract"
+        value_wei = int(transaction.get("value", "0x0"), 16)
+        value_eth = value_wei / 10**18
+
+        gas_used = int(receipt["gasUsed"], 16)
+        gas_price = receipt.get("effectiveGasPrice")
+
+        if gas_price is not None:
+            fee_wei = gas_used * int(gas_price, 16)
+            fee_eth = fee_wei / 10**18
+            fee_text = f"{fee_eth:.10f} ETH"
+        else:
+            fee_text = "unavailable"
+
+        summary = (
+            f"This transaction {summary_status} transferred "
+            f"{value_eth:.8f} ETH from {sender} to {recipient}. "
+            f"It used {gas_used:,} gas and paid {fee_text} "
+            f"in transaction fees."
+        )
+
+        st.write(summary)
+    else:
+        st.info("Transaction details are unavailable for the summary.")
+
 st.caption("Built with Python and Streamlit.")
