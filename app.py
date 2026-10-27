@@ -43,29 +43,39 @@ if st.button("Analyze transaction"):
             response.raise_for_status()
             data = response.json()
 
-            receipt = data.get("result")
+            
+receipt = data.get("result")
 
-            if not isinstance(receipt, dict):
-                st.error("Could not retrieve this transaction receipt.")
-                st.write(data)
-            else:
-                status = receipt.get("status")
+if "error" in data:
+    st.error("Ethereum API returned an error.")
+    st.json(data["error"])
 
-                if status == "0x1":
-                    st.success("Transaction succeeded.")
-                elif status == "0x0":
-                    st.error("Transaction reverted.")
-                else:
-                    st.warning("Transaction status is unavailable.")
+elif receipt is None:
+    st.warning(
+        "No transaction receipt found. "
+        "The transaction may be pending or the hash may be incorrect."
+    )
+    st.json(data)
 
-                st.write("Block number:", int(receipt["blockNumber"], 16))
-                st.write("Gas used:", int(receipt["gasUsed"], 16))
+elif not isinstance(receipt, dict):
+    st.error("Unexpected API response.")
+    st.json(data)
+
+else:
+    status = receipt.get("status")
+
+    if status == "0x1":
+        st.success("Transaction succeeded.")
+    elif status == "0x0":
+        st.error("Transaction reverted.")
+    else:
+        st.warning("Transaction status is unavailable.")
+
+    st.write("Block number:", int(receipt["blockNumber"], 16))
+    st.write("Gas used:", int(receipt["gasUsed"], 16))
 
         except requests.RequestException as error:
             st.error(f"API request failed: {error}")
-
-
-
 
 st.divider()
 
