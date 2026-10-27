@@ -9,13 +9,21 @@ st.set_page_config(
     page_icon="🔎",
 )
 
-st.title("🔎 TxLens")
-st.subheader("Understand what happened on-chain.")
 
-st.write(
-    "TxLens helps you understand Ethereum transactions "
-    "through readable, verifiable data."
+tx_hash = st.text_input(
+    "Ethereum transaction hash",
+    placeholder="Paste a transaction hash here...",
 )
+
+if st.button("Analyze transaction"):
+    tx_hash = tx_hash.strip()
+
+    if len(tx_hash) != 66 or not tx_hash.startswith("0x"):
+        st.error("Invalid transaction hash format.")
+    else:
+        st.success("Transaction hash format looks correct.")
+        st.code(tx_hash)
+
 
 st.divider()
 
