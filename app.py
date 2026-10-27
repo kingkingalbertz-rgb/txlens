@@ -82,6 +82,38 @@ if st.button("Analyze transaction"):
                     "Gas used:",
                     int(receipt["gasUsed"], 16),
                 )
+                
+            # Fetch transaction details
+            tx_params = {
+                "chainid": "1",
+                "module": "proxy",
+                "action": "eth_getTransactionByHash",
+                "txhash": tx_hash,
+                "apikey": api_key,
+            }
+
+            tx_response = requests.get(
+                "https://api.etherscan.io/v2/api",
+                params=tx_params,
+                timeout=15,
+            )
+            tx_response.raise_for_status()
+            tx_data = tx_response.json()
+            transaction = tx_data.get("result")
+
+            if isinstance(transaction, dict):
+                sender = transaction.get("from")
+                recipient = transaction.get("to")
+                value_wei = int(transaction.get("value", "0x0"), 16)
+                value_eth = value_wei / 10**18
+
+                st.subheader("Transfer details")
+                st.write("From:", sender)
+                st.write("To:", recipient or "Contract creation")
+                st.write("ETH transferred:", f"{value_eth:.8f} ETH")
+            else:
+                st.warning("Could not retrieve transaction details.")
+
 
         except requests.RequestException as error:
             st.error(f"API request failed: {error}")
