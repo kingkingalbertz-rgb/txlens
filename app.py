@@ -1,17 +1,32 @@
+
+import streamlit as st
+
 APP_NAME = "TxLens"
 NETWORK = "Ethereum Mainnet"
 
+st.set_page_config(
+    page_title=APP_NAME,
+    page_icon="🔎",
+)
 
-def get_app_info():
-    return {
-        "name": APP_NAME,
-        "network": NETWORK,
-        "version": "0.1.0",
-    }
+st.title("🔎 TxLens")
+st.subheader("Understand what happened on-chain.")
 
+st.write(
+    "TxLens helps you understand Ethereum transactions "
+    "through readable, verifiable data."
+)
 
-app_info = get_app_info()
+st.divider()
 
-print("Application:", app_info["name"])
-print("Network:", app_info["network"])
-print("Version:", app_info["version"])
+st.info("Version 0.1 — Your transaction analysis tool is taking shape.")
+
+st.text_input(
+    "Ethereum transaction hash",
+    placeholder="Paste a transaction hash here...",
+)
+
+st.button("Analyze transaction")
+
+st.caption("Built with Python and Streamlit.")
+
