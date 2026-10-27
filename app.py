@@ -83,6 +83,21 @@ if st.button("Analyze transaction"):
                     int(receipt["gasUsed"], 16),
                 )
                 
+                effective_gas_price = receipt.get("effectiveGasPrice")
+
+                if effective_gas_price is not None:
+                    gas_used = int(receipt["gasUsed"], 16)
+                    gas_price_wei = int(effective_gas_price, 16)
+
+                    fee_wei = gas_used * gas_price_wei
+                    fee_eth = fee_wei / 10**18
+
+                    st.write("Effective gas price:", f"{gas_price_wei / 10**9:.4f} Gwei")
+                    st.write("Transaction fee:", f"{fee_eth:.10f} ETH")
+                else:
+                    st.warning("Effective gas price is unavailable.")
+
+                
             # Fetch transaction details
             tx_params = {
                 "chainid": "1",
